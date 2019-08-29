@@ -16,6 +16,8 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     zabbix_user = @resource[:zabbix_user]
     zabbix_pass = @resource[:zabbix_pass]
     apache_use_ssl = @resource[:apache_use_ssl]
+    tls_connect = @resource[:tls_connect]
+    tls_accept = @resource[:tls_accept]
 
     # Connect to zabbix api
     zbx = self.class.create_connection(zabbix_url, zabbix_user, zabbix_pass, apache_use_ssl)
@@ -38,6 +40,12 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     ipaddress = '' if ipaddress.nil? && use_ip.zero?
 
     hostgroup_create = hostgroup_create ? 1 : 0
+
+    # Check if we need TLS to connect to host
+    tls_connect = tls_connect.nil? ? 1 : tls_connect
+
+    # Check if we need TLS to connect from host
+    tls_accept = tls_accept.nil? ? 1 : tls_accept
 
     # First check if we have an correct hostgroup and if not, we raise an error.
     search_hostgroup = zbx.hostgroups.get_id(name: hostgroup)
@@ -62,7 +70,9 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
         }
       ],
       templates: template_array,
-      groups: [groupid: search_hostgroup]
+      groups: [groupid: search_hostgroup],
+      tls_connect: tls_connect,
+      tls_accept: tls_accept,
     )
 
     zbx.templates.mass_add(hosts_id: [hostid], templates_id: template_array)

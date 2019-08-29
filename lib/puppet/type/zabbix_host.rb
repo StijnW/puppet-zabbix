@@ -51,4 +51,13 @@ Puppet::Type.newtype(:zabbix_host) do
   newparam(:apache_use_ssl) do
     desc 'If apache is uses with ssl'
   end
+
+  newparam(:tls_connect) do
+    desc 'If TLS is used from host. 1 = no encryption ; 2 = PSK ; 4 = certificate.'
+  end
+
+  newparam(:tls_accpet) do
+    desc 'If TLS is used to host. 1 = no encryption ; 2 = PSK ; 4 = certificate.'
+  end
+
 end
