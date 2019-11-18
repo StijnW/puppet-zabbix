@@ -333,7 +333,7 @@ class zabbix::agent (
       ipaddress    => $listen_ip,
       use_ip       => $agent_use_ip,
       port         => $listenport,
-      group        => $zbx_group,
+      groups       => Array($zbx_group),
       group_create => $zbx_group_create,
       templates    => $zbx_templates,
       proxy        => $use_proxy,

@@ -20,7 +20,15 @@ Puppet::Type.newtype(:zabbix_host) do
     desc 'The port that the zabbix agent is listening on.'
   end
 
-  newparam(:group) do
+  newproperty(:group) do
+    desc 'Deprecated! Name of the hostgroup.'
+
+    validate do |_value|
+      Puppet.warning('Passing group to zabbix_host is deprecated and will be removed. Use groups instead.')
+    end
+  end
+
+  newparam(:groups) do
     desc 'Name of the hostgroup.'
   end
 
@@ -56,7 +64,7 @@ Puppet::Type.newtype(:zabbix_host) do
     desc 'If TLS is used from host. 1 = no encryption ; 2 = PSK ; 4 = certificate.'
   end
 
-  newparam(:tls_accpet) do
+  newparam(:tls_accept) do
     desc 'If TLS is used to host. 1 = no encryption ; 2 = PSK ; 4 = certificate.'
   end
 
