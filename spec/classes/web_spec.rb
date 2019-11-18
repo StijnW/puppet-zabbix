@@ -126,25 +126,26 @@ describe 'zabbix::web' do
             )
           end
 
-          it { is_expected.to contain_class('zabbix::resources::web') }
-          it { is_expected.to contain_package('zabbixapi').that_requires('Class[ruby::dev]').with_provider('puppet_gem') }
-          it { is_expected.to contain_class('ruby::dev') }
+          it do
+            is_expected.to contain_class('zabbix::resources::web').
+              with_zabbix_url('zabbix.example.com').
+              with_zabbix_user('Admin').
+              with_zabbix_pass('zabbix').
+              with_apache_use_ssl(false)
+          end
+          it do
+            is_expected.to contain_file('/etc/zabbix/api.conf').
+              with_ensure('file').
+              with_owner('root').
+              with_group('root').
+              with_mode('0400').
+              with_content(%r{zabbix_url     = zabbix\.example\.com}).
+              with_content(%r{zabbix_user    = Admin}).
+              with_content(%r{zabbix_pass    = zabbix}).
+              with_content(%r{apache_use_ssl = false})
+          end
+          it { is_expected.to contain_package('zabbixapi').with_provider('puppet_gem') }
           it { is_expected.to contain_file('/etc/zabbix/imported_templates').with_ensure('directory') }
-        end
-
-        describe 'when manage_resources and is_pe are true' do
-          let :facts do
-            facts.merge(
-              is_pe: true,
-              pe_version: '3.7.0'
-            )
-          end
-
-          let :params do
-            super().merge(manage_resources: true)
-          end
-
-          it { is_expected.to contain_package('zabbixapi').with_provider('pe_puppetserver_gem') }
         end
 
         describe 'when manage_resources is false' do

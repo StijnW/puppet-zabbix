@@ -146,6 +146,7 @@ class zabbix (
   $cacheupdatefrequency                     = $zabbix::params::server_cacheupdatefrequency,
   $startdbsyncers                           = $zabbix::params::server_startdbsyncers,
   $historycachesize                         = $zabbix::params::server_historycachesize,
+  Zabbix::Historyics $historyindexcachesize = $zabbix::params::server_historyindexcachesize,
   $trendcachesize                           = $zabbix::params::server_trendcachesize,
   $historytextcachesize                     = $zabbix::params::server_historytextcachesize,
   $valuecachesize                           = $zabbix::params::server_valuecachesize,
@@ -180,7 +181,7 @@ class zabbix (
   Optional[String] $zabbix_server_name      = $zabbix::params::zabbix_server,
 ) inherits zabbix::params {
 
-  class { '::zabbix::web':
+  class { 'zabbix::web':
     zabbix_url                               => $zabbix_url,
     database_type                            => $database_type,
     manage_repo                              => $manage_repo,
@@ -220,7 +221,7 @@ class zabbix (
     require                                  => Class['zabbix::server'],
   }
 
-  class { '::zabbix::server':
+  class { 'zabbix::server':
     database_type             => $database_type,
     database_path             => $database_path,
     zabbix_version            => $zabbix_version,
@@ -270,6 +271,7 @@ class zabbix (
     historycachesize          => $historycachesize,
     trendcachesize            => $trendcachesize,
     historytextcachesize      => $historytextcachesize,
+    historyindexcachesize     => $historyindexcachesize,
     valuecachesize            => $valuecachesize,
     nodenoevents              => $nodenoevents,
     nodenohistory             => $nodenohistory,
@@ -301,7 +303,7 @@ class zabbix (
     require                   => Class['zabbix::database'],
   }
 
-  class { '::zabbix::database':
+  class { 'zabbix::database':
     zabbix_type       => 'server',
     zabbix_web        => $zabbix_web,
     zabbix_server     => $zabbix_server,

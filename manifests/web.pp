@@ -152,7 +152,7 @@
 # Set location of client key used by LDAP authentication.
 #
 # [*ldap_reqcert *]
-# Specifies what checks to perform on a server certificate 
+# Specifies what checks to perform on a server certificate
 #
 # [*puppetgem*]
 # Provider for the zabbixapi gem package
@@ -266,14 +266,6 @@ class zabbix::web (
   # is set to false, you'll get warnings like this:
   # "Warning: You cannot collect without storeconfigs being set"
   if $manage_resources {
-    include ruby::dev
-    $compile_packages = $facts['os']['family'] ? {
-      'RedHat' => [ 'make', 'gcc-c++', ],
-      'Debian' => [ 'make', 'g++', ],
-      default  => [],
-    }
-    ensure_packages($compile_packages, { before => Package['zabbixapi'], })
-
     # Determine correct zabbixapi version.
     case $zabbix_version {
       '2.2': {
@@ -302,7 +294,6 @@ class zabbix::web (
     -> package { 'zabbixapi':
       ensure   => $zabbixapi_version,
       provider => $puppetgem,
-      require  => Class['ruby::dev'],
     }
     -> class { 'zabbix::resources::web':
       zabbix_url     => $zabbix_url,
@@ -376,7 +367,7 @@ class zabbix::web (
 
   # Webinterface config file
   file { '/etc/zabbix/web/zabbix.conf.php':
-    ensure  => present,
+    ensure  => file,
     owner   => $web_config_owner,
     group   => $web_config_group,
     mode    => '0640',

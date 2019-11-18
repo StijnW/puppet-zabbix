@@ -42,7 +42,10 @@
 #   connection should me made via ip, not fqdn.
 #
 # [*zbx_group*]
-#   Name of thehostgroup where this host needs to be added.
+#   Deprecated! Name of the hostgroup where this host needs to be added.
+#
+# [*zbx_groups*]
+#   An array of hostgroups where this host needs to be added.
 #
 # [*zbx_templates*]
 #   List of templates which will be added when host is configured.
@@ -329,6 +332,22 @@ class zabbix::agent (
   # is set to false, you'll get warnings like this:
   # "Warning: You cannot collect without storeconfigs being set"
   if $manage_resources {
+    # Migrate deprecated zbx_group parameter
+    if $zbx_group == $zabbix::params::agent_zbx_group and $zbx_groups == $zabbix::params::agent_zbx_groups {
+      $groups = $zabbix::params::agent_zbx_groups
+    } else {
+      if $zbx_group != $zabbix::params::agent_zbx_group and $zbx_groups != $zabbix::params::agent_zbx_groups {
+        fail("Seems like you have filled zbx_group and zbx_groups with custom values. This isn't support! Please use zbx_groups only.")
+      }
+
+      if $zbx_group != $zabbix::params::agent_zbx_group {
+        warning('Passing zbx_group to zabbix::agent is deprecated and will be removed. Use zbx_groups instead.')
+        $groups = Array($zbx_group)
+      } else {
+        $groups = $zbx_groups
+      }
+    }
+
     if $monitored_by_proxy != '' {
       $use_proxy = $monitored_by_proxy
     } else {
@@ -405,7 +424,7 @@ class zabbix::agent (
 
   # Configuring the zabbix-agent configuration file
   file { $agent_configfile_path:
-    ensure  => present,
+    ensure  => file,
     owner   => $agent_config_owner,
     group   => $agent_config_group,
     mode    => '0644',

@@ -69,6 +69,12 @@
 # [*sourceip*]
 #   Source ip address for outgoing connections.
 #
+# [*enableremotecommands*]
+#   Whether remote commands from zabbix server are allowed.
+#
+# [*logremotecommands*]
+#   Enable logging of executed shell commands as warnings.
+#
 # [*logfile*]
 #   Name of log file.
 #
@@ -347,6 +353,8 @@ class zabbix::proxy (
   $hostname                        = $zabbix::params::proxy_hostname,
   $listenport                      = $zabbix::params::proxy_listenport,
   $sourceip                        = $zabbix::params::proxy_sourceip,
+  Integer[0] $enableremotecommands = $zabbix::params::proxy_enableremotecommands,
+  Integer[0] $logremotecommands    = $zabbix::params::proxy_logremotecommands,
   $logfile                         = $zabbix::params::proxy_logfile,
   $logfilesize                     = $zabbix::params::proxy_logfilesize,
   $debuglevel                      = $zabbix::params::proxy_debuglevel,
@@ -441,7 +449,7 @@ class zabbix::proxy (
   # is set to false, you'll get warnings like this:
   # "Warning: You cannot collect without storeconfigs being set"
   if $manage_resources {
-    class { '::zabbix::resources::proxy':
+    class { 'zabbix::resources::proxy':
       hostname  => $hostname,
       ipaddress => $listen_ip,
       use_ip    => $use_ip,
@@ -466,7 +474,7 @@ class zabbix::proxy (
     case $database_type {
       'postgresql' : {
         # Execute the postgresql scripts
-        class { '::zabbix::database::postgresql':
+        class { 'zabbix::database::postgresql':
           zabbix_type          => 'proxy',
           zabbix_version       => $zabbix_version,
           database_schema_path => $database_schema_path,
@@ -480,7 +488,7 @@ class zabbix::proxy (
       }
       'mysql'      : {
         # Execute the mysql scripts
-        class { '::zabbix::database::mysql':
+        class { 'zabbix::database::mysql':
           zabbix_type          => 'proxy',
           zabbix_version       => $zabbix_version,
           database_schema_path => $database_schema_path,
@@ -503,7 +511,7 @@ class zabbix::proxy (
 
   # Only include the repo class if it has not yet been included
   unless defined(Class['Zabbix::Repo']) {
-    class { '::zabbix::repo':
+    class { 'zabbix::repo':
       manage_repo    => $manage_repo,
       zabbix_version => $zabbix_version,
     }
@@ -514,7 +522,7 @@ class zabbix::proxy (
 
   # Now we are going to install the correct packages.
   case $facts['os']['name'] {
-    'redhat', 'centos', 'oraclelinux' : {
+    'redhat', 'centos', 'oraclelinux', 'VirtuozzoLinux': {
       #There is no zabbix-proxy package in 3.0
       if versioncmp('3.0',$zabbix_version) > 0 {
         package { 'zabbix-proxy':
@@ -586,7 +594,7 @@ class zabbix::proxy (
 
   # Configuring the zabbix-proxy configuration file
   file { $proxy_configfile_path:
-    ensure  => present,
+    ensure  => file,
     owner   => 'zabbix',
     group   => 'zabbix',
     mode    => '0644',

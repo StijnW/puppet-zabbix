@@ -403,7 +403,7 @@ class zabbix::server (
 
   # Only include the repo class if it has not yet been included
   unless defined(Class['Zabbix::Repo']) {
-    class { '::zabbix::repo':
+    class { 'zabbix::repo':
       zabbix_version => $zabbix_version,
       manage_repo    => $manage_repo,
     }
@@ -418,7 +418,7 @@ class zabbix::server (
 
       if $manage_database {
         # Execute the postgresql scripts
-        class { '::zabbix::database::postgresql':
+        class { 'zabbix::database::postgresql':
           zabbix_type          => 'server',
           zabbix_version       => $zabbix_version,
           database_schema_path => $database_schema_path,
@@ -436,7 +436,7 @@ class zabbix::server (
 
       if $manage_database {
         # Execute the mysql scripts
-        class { '::zabbix::database::mysql':
+        class { 'zabbix::database::mysql':
           zabbix_type          => 'server',
           zabbix_version       => $zabbix_version,
           database_schema_path => $database_schema_path,
@@ -473,6 +473,10 @@ class zabbix::server (
       service_name              => 'zabbix-server',
       require                   => Package["zabbix-server-${db}"],
     }
+
+    $require_for_service = [Package["zabbix-server-${db}"], File[$include_dir], File[$server_configfile_path], Zabbix::Startup['zabbix-server']]
+  } else {
+    $require_for_service = [Package["zabbix-server-${db}"], File[$include_dir], File[$server_configfile_path]]
   }
 
   if $server_configfile_path != '/etc/zabbix/zabbix_server.conf' {
@@ -519,11 +523,7 @@ class zabbix::server (
         enable     => true,
         hasstatus  => true,
         hasrestart => true,
-        require    => [
-          Package["zabbix-server-${db}"],
-          File[$include_dir],
-          File[$server_configfile_path],
-          ],
+        require    => $require_for_service,
         subscribe  => File[$server_configfile_path],
       }
     }
@@ -531,7 +531,7 @@ class zabbix::server (
 
   # Configuring the zabbix-server configuration file
   file { $server_configfile_path:
-    ensure  => present,
+    ensure  => file,
     owner   => $server_config_owner,
     group   => $server_config_group,
     mode    => '0640',
@@ -567,15 +567,18 @@ class zabbix::server (
   }
   # check if selinux is active and allow zabbix
   if $facts['selinux'] == true and $manage_selinux {
-    selboolean{'zabbix_can_network':
-      persistent => true,
-      value      => 'on',
-      notify     => $dependency,
-    }
-    -> selinux::module{'zabbix-server':
+    ensure_resource ('selboolean',
+      [
+        'zabbix_can_network',
+      ], {
+        persistent => true,
+        value      => 'on',
+      })
+    selinux::module{'zabbix-server':
       ensure    => 'present',
       source_te => 'puppet:///modules/zabbix/zabbix-server.te',
       before    => $dependency,
+      require   => Selboolean['zabbix_can_network'],
     }
     # zabbix-server 3.4 introduced IPC via a socket in /tmp
     # https://support.zabbix.com/browse/ZBX-12567

@@ -2,25 +2,35 @@ require_relative '../zabbix'
 Puppet::Type.type(:zabbix_hostgroup).provide(:ruby, parent: Puppet::Provider::Zabbix) do
   confine feature: :zabbixapi
 
-  def connect
-    @zbx ||= self.class.create_connection(@resource[:zabbix_url], @resource[:zabbix_user], @resource[:zabbix_pass], @resource[:apache_use_ssl])
-    @zbx
+  def self.instances
+    api_hostgroups = zbx.hostgroups.all
+    api_hostgroups.map do |group_name, _id|
+      new(
+        ensure: :present,
+        name: group_name
+      )
+    end
+  end
+
+  def self.prefetch(resources)
+    instances.each do |prov|
+      if (resource = resources[prov.name])
+        resource.provider = prov
+      end
+    end
   end
 
   def create
     # Connect to zabbix api
-    zbx = connect
     hgid = zbx.hostgroups.create(name: @resource[:name])
     hgid
   end
 
   def exists?
-    zbx = connect
-    zbx.hostgroups.get_id(name: @resource[:name])
+    @property_hash[:ensure] == :present
   end
 
   def destroy
-    zbx = connect
     zbx.hostgroups.delete(zbx.hostgroups.get_id(name: @resource[:name]))
   end
 end

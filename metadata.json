@@ -1,44 +1,36 @@
 {
   "name": "puppet-zabbix",
-  "version": "6.7.0",
+  "version": "7.0.1-rc0",
   "summary": "Installing and maintaining Zabbix. Will install server, proxy, java-gateway and agent on RedHat/Debian/Ubuntu (Incl. exported resources).",
   "author": "Vox Pupuli",
   "dependencies": [
     {
       "name": "puppetlabs/postgresql",
-      "version_requirement": ">= 4.4.2 < 6.0.0"
+      "version_requirement": ">= 4.4.2 < 7.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.25.0 < 6.0.0"
+      "version_requirement": ">= 4.25.0 < 7.0.0"
     },
     {
       "name": "puppetlabs/mysql",
-      "version_requirement": ">= 3.5.0 < 7.0.0"
+      "version_requirement": ">= 3.5.0 < 11.0.0"
     },
     {
       "name": "puppetlabs/apache",
-      "version_requirement": ">= 1.6.0 < 4.0.0"
+      "version_requirement": ">= 1.6.0 < 6.0.0"
     },
     {
       "name": "puppetlabs/firewall",
-      "version_requirement": ">= 1.7.0 < 2.0.0"
-    },
-    {
-      "name": "puppetlabs/ruby",
-      "version_requirement": ">= 0.6.0 < 2.0.0"
-    },
-    {
-      "name": "puppetlabs/pe_gem",
-      "version_requirement": ">= 0.2.0 < 2.0.0"
+      "version_requirement": ">= 1.7.0 < 3.0.0"
     },
     {
       "name": "puppetlabs/apt",
-      "version_requirement": ">= 2.1.0 < 7.0.0"
+      "version_requirement": ">= 2.1.0 < 8.0.0"
     },
     {
       "name": "puppetlabs/concat",
-      "version_requirement": ">= 2.2.1 < 6.0.0"
+      "version_requirement": ">= 4.1.0 < 7.0.0"
     },
     {
       "name": "camptocamp/systemd",
@@ -46,7 +38,7 @@
     },
     {
       "name": "puppet/selinux",
-      "version_requirement": ">= 1.1.0 < 2.0.0"
+      "version_requirement": ">= 1.1.0 < 4.0.0"
     }
   ],
   "source": "https://github.com/voxpupuli/puppet-zabbix.git",
@@ -64,7 +56,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.10.0 < 7.0.0"
+      "version_requirement": ">= 5.5.8 < 7.0.0"
     }
   ],
   "operatingsystem_support": [
@@ -139,6 +131,13 @@
       "operatingsystem": "PCS",
       "operatingsystemrelease": [
         "6"
+      ]
+    },
+    {
+      "operatingsystem": "VirtuozzoLinux",
+      "operatingsystemrelease": [
+        "6",
+        "7"
       ]
     },
     {
