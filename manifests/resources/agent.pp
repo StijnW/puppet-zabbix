@@ -23,6 +23,11 @@ class zabbix::resources::agent (
   $group_create            = undef,
   $templates               = undef,
   $proxy                   = undef,
+  $zabbix_user             = undef,
+  $zabbix_pass             = undef,
+  $apache_use_ssl          = undef,
+  $tls_connect             = undef,
+  $tls_accept              = undef,
 ) {
   if $group and $groups {
     fail("Got group and groups. This isn't support! Please use groups only.")
@@ -36,12 +41,17 @@ class zabbix::resources::agent (
   }
 
   @@zabbix_host { $hostname:
-    ipaddress    => $ipaddress,
-    use_ip       => $use_ip,
-    port         => $port,
-    groups       => $groups,
-    group_create => $group_create,
-    templates    => $templates,
-    proxy        => $proxy,
+    ipaddress      => $ipaddress,
+    use_ip         => $use_ip,
+    port           => $port,
+    groups         => $groups,
+    group_create   => $group_create,
+    templates      => $templates,
+    proxy          => $proxy,
+    zabbix_user    => $zabbix_user,
+    zabbix_pass    => $zabbix_pass,
+    apache_use_ssl => $apache_use_ssl,
+    tls_connect    => $tls_connect,
+    tls_accept     => $tls_accept,
   }
 }

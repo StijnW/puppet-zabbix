@@ -135,6 +135,9 @@
 #   Drop privileges to a specific, existing user on the system.
 #   Only has effect if run as 'root' and AllowRoot is disabled.
 #
+# [*zabbix_pass*]
+#   Zabbix-api passwords
+#
 # [*zabbix_alias*]
 #   Sets an alias for parameter.
 #
@@ -170,6 +173,9 @@
 #
 # [*tlsservercertsubject*]
 #   Allowed server certificate subject.
+#
+# [*apache_use_ssl*]
+#   If apache is uses with ssl
 #
 # [*include_dir*]
 #   You may include individual files or all files in a directory in the configuration file.
@@ -254,6 +260,7 @@ class zabbix::agent (
   $timeout                                = $zabbix::params::agent_timeout,
   $allowroot                              = $zabbix::params::agent_allowroot,
   $zabbix_user                            = $zabbix::params::agent_zabbix_user,
+  $zabbix_pass                            = $zabbix::params::agent_zabbix_pass,
   $include_dir                            = $zabbix::params::agent_include,
   $include_dir_purge                      = $zabbix::params::agent_include_purge,
   $unsafeuserparameters                   = $zabbix::params::agent_unsafeuserparameters,
@@ -270,6 +277,7 @@ class zabbix::agent (
   $tlspskidentity                         = $zabbix::params::agent_tlspskidentity,
   $tlsservercertissuer                    = $zabbix::params::agent_tlsservercertissuer,
   $tlsservercertsubject                   = $zabbix::params::agent_tlsservercertsubject,
+  $apache_use_ssl                         = $zabbix::params::apache_use_ssl,
   String $agent_config_owner              = $zabbix::params::agent_config_owner,
   String $agent_config_group              = $zabbix::params::agent_config_group,
   Boolean $manage_selinux                 = $zabbix::params::manage_selinux,
@@ -329,14 +337,19 @@ class zabbix::agent (
     $_hostname = pick($hostname, $facts['fqdn'])
 
     class { 'zabbix::resources::agent':
-      hostname     => $_hostname,
-      ipaddress    => $listen_ip,
-      use_ip       => $agent_use_ip,
-      port         => $listenport,
-      groups       => Array($zbx_group),
-      group_create => $zbx_group_create,
-      templates    => $zbx_templates,
-      proxy        => $use_proxy,
+      hostname       => $_hostname,
+      ipaddress      => $listen_ip,
+      use_ip         => $agent_use_ip,
+      port           => $listenport,
+      groups         => Array($zbx_group),
+      group_create   => $zbx_group_create,
+      templates      => $zbx_templates,
+      proxy          => $use_proxy,
+      zabbix_user    => $zabbix_user,
+      zabbix_pass    => $zabbix_pass,
+      apache_use_ssl => $apache_use_ssl,
+      tls_connect    => $tlsconnect,
+      tls_accept     => $tlsaccept,
     }
   }
 
