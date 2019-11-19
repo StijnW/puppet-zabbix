@@ -8,7 +8,7 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     ipaddress = @resource[:ipaddress]
     use_ip = @resource[:use_ip]
     port = @resource[:port]
-    hostgroup = @resource[:group]
+    hostgroup = @resource[:groups][0] # Quick fix
     hostgroup_create = @resource[:group_create]
     templates = @resource[:templates]
     proxy = @resource[:proxy]
