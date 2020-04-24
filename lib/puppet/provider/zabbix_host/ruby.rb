@@ -27,10 +27,18 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     if templates.is_a?(Array)
       templates.each do |template|
         template_id = self.class.get_template_id(zbx, template)
-        template_array.push template_id
+        if template_id.nil?
+          raise Puppet::Error, 'The template (' + template + ') does not exist in zabbix. Please use a correct one.'
+        else
+          template_array.push template_id
+        end
       end
     else
-      template_array.push self.class.get_template_id(zbx, templates)
+      if template_id.nil?
+        raise Puppet::Error, 'The template (' + template + ') does not exist in zabbix. Please use a correct one.'
+      else
+        template_array.push self.class.get_template_id(zbx, templates)
+      end
     end
 
     # Check if we need to connect via ip or fqdn
@@ -122,4 +130,7 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     zbx = self.class.create_connection(zabbix_url, zabbix_user, zabbix_pass, apache_use_ssl)
     zbx.hosts.delete(zbx.hosts.get_id(host: host))
   end
+
+  def check_values
+
 end

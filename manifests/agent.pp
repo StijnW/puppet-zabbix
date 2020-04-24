@@ -341,7 +341,7 @@ class zabbix::agent (
       ipaddress      => $listen_ip,
       use_ip         => $agent_use_ip,
       port           => $listenport,
-      groups         => Array($zbx_group),
+      groups         => Array($zbx_group), # Do not use multiple groups in the array, currently not supported by the provider!
       group_create   => $zbx_group_create,
       templates      => $zbx_templates,
       proxy          => $use_proxy,
