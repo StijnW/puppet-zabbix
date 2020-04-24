@@ -28,7 +28,7 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
       templates.each do |template|
         template_id = self.class.get_template_id(zbx, template)
         if template_id.nil?
-          raise Puppet::Error, 'The template (' + template + ') does not exist in zabbix. Please use a correct one.'
+          raise Puppet::Error, 'The template "' + template + '" for host ' + host + ' does not exist in zabbix. Please use a correct one.'
         else
           template_array.push template_id
         end
@@ -130,7 +130,5 @@ Puppet::Type.type(:zabbix_host).provide(:ruby, parent: Puppet::Provider::Zabbix)
     zbx = self.class.create_connection(zabbix_url, zabbix_user, zabbix_pass, apache_use_ssl)
     zbx.hosts.delete(zbx.hosts.get_id(host: host))
   end
-
-  def check_values
 
 end
